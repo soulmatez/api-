@@ -1,84 +1,41 @@
-<!DOCTYPE html>
+<?php 
 
-<html>
+ini_set('user_agent','Mozilla/4.0(compatible; MSIE 6.0; Windows NT 5.2; SV1; .NET CLR1.1.4322)');
 
-<head>
+$data=curl_get("https://api.huobi.pro/market/trade?symbol=filusdt");
 
-<title>钱包</title>
+$date1=$data;
 
-<meta http-equiv="Content-Type" content="textml; charset=UTF-8">
+$fil = $date1["tick"]["data"][0];
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+// var_dump($fil);exit;
 
-<link href="css/main.css" rel="stylesheet" type="text/css" media="all" />
+function curl_get($url){
+        $oCurl = curl_init();
+        if(stripos($url, "https://") !== FALSE) {
+            curl_setopt($oCurl, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($oCurl, CURLOPT_SSL_VERIFYHOST, FALSE);
+            curl_setopt($oCurl, CURLOPT_SSLVERSION, 1); //CURL_SSLVERSION_TLSv1
+        }
+        curl_setopt($oCurl, CURLOPT_HTTPHEADER, ['client-type:web']);//火币网接口需要这个
+        curl_setopt($oCurl, CURLOPT_TIMEOUT, 10);
+        curl_setopt($oCurl, CURLOPT_URL, $url);
+        curl_setopt($oCurl, CURLOPT_RETURNTRANSFER, 1);
+        $sContent = curl_exec($oCurl);
+        $aStatus = curl_getinfo($oCurl);
+        $error = curl_error($oCurl);
+        curl_close($oCurl);
+        if($error) {
+            $sContent = file_get_contents($url);
+            return $sContent;
+        }
 
-<link href="css/layer.css" rel="stylesheet" type="text/css" media="all" />
-
-<link rel="stylesheet" type="text/css" href="css/style.css"/>
-
-
-
-
-</head>
-
-<body>
-
-<div id="modal-container">
-  <div class="modal-background">
-    <div class="modal">
-      <div id="qrcode" style="margin:auto"></div> 
-      <button class="adbtn ewm_btn">分享链接</button>
-      
-    </div>
-  </div>
-</div>
-
-
-
-<div class="wrapper">
-
-  
-
-</div>
+        if(intval($aStatus["http_code"]) == 200) {
+            return json_decode($sContent,true);
+        } else {
+            return false;
+        }
+    }
 
 
-<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-<script>
-	
-	
-	function showalert()
-	{	
-		
-		$.ajax({
-			               //请求方式
-			               type : "GET",
-			               //请求地址
-			               url : "https://api.binance.com/api/v3/ticker/price",
-			               //请求成功
-			               success : function(result) {
-			                   console.log(result);
-			               },
-			               //请求失败，包含具体的错误信息
-			               error : function(e){
-			                   console.log(e.status);
-			                   console.log(e.responseText);
-			               }
-			           });
-		
-	}
-	
-	 $(function(){
-		 
-		setInterval(showalert, 2000);
-		
-	 });
-	
-</script>
-
-
-
-
-</body>
-
-</html>
-
+?>
